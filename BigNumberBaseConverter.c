@@ -42,6 +42,8 @@ void my_strrev(char *str) {
 bool is_overflow(uint64_t input_val) {
 	size_t msb = (size_t) log2(input_val);
 
+    printf("msb: %zu\n", msb);
+
 	return (msb < 63) ? 0 : 1;
 }
 
@@ -61,7 +63,10 @@ uint64_t pre_process(char *input, const int size, const int from) {
 			(!isdigit(input[i])) ? (type = type_y) : (type = type_x);
 		common = common + ((input[i] - type) * (pow(base, i)));
 	}
-	
+
+    printf("===> %d\n", common);
+    printf("==> %"PRIu64"\n", common);
+
 	if(is_overflow(common)) {
 		fprintf(stderr, "core: number is too large\n");
 		return 0;
