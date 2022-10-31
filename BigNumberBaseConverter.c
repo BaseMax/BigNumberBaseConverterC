@@ -7,7 +7,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> // strrev
+#include <string.h> // strrev, strlen
+#include <ctype.h> // isspace
 
 void my_strrev(char *str) {
     int i = strlen(str) - 1, j = 0;
@@ -59,26 +60,45 @@ void convert_base(char* a, int f, int t) {
     printf("%s", res);
 }
 
-char *file_reads(char *filename) {
-    FILE *file = fopen(filename, "r");
-    if(file == NULL) {
-        printf("Error: File not found: %s\n", filename);
-        exit(1);
-    }
+char *file_reads(char *filepath) {
+	FILE* file = fopen(filepath, "rb");
+	if (file == NULL) {
+		printf("Could not open file \"%s\".", filepath);
+		exit(74);
+	}
 
-    fseek(file, 0, SEEK_END);
-    long length = ftell(file);
-    fseek(file, 0, SEEK_SET);
+	fseek(file, 0L, SEEK_END);
+	size_t fileSize = ftell(file);
+	rewind(file);
 
-    char *buffer = malloc(length);
-    if(buffer) {
-        fread(buffer, 1, length, file);
-    }
+	char* buffer = (char*)malloc(fileSize + 1);
+	if (buffer == NULL) {
+		printf("Not enough memory to read \"%s\".", filepath);
+		exit(74);
+	}
 
-    fclose(file);
+	size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
+	if (bytesRead < fileSize) {
+		printf("Could not read the \"%s\".", filepath);
+		exit(74);
+	}
 
-    return buffer;
+	buffer[bytesRead] = '\0';
+
+	fclose(file);
+	return buffer;
 }
+
+char* trim(char* str) {
+    char* end;
+    while(isspace((unsigned char)*str)) str++;
+    if(*str == 0) return str;
+    end = str + strlen(str) - 1;
+    while(end > str && isspace((unsigned char)*end)) end--;
+    end[1] = '\0';
+    return str;
+}
+
 
 int main(int argc, char** argv) {
     if(argc != 4 && argc != 5) {
@@ -97,6 +117,11 @@ int main(int argc, char** argv) {
         to = atoi(argv[3]);
     } else if (argc == 5) {
         number = file_reads(argv[2]);
+        if (number == NULL) {
+            printf("Error in reading the file!\n");
+            return 1;
+        }
+        number = trim(number);
         from = atoi(argv[3]);
         to = atoi(argv[4]);
     }
