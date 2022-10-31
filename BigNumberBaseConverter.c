@@ -25,79 +25,17 @@ void my_strrev(char *str) {
     }
 }
 
-// Convert number `a` from base `f` to base `t`
-// void convert_base(char* a, int f, int t) {
-//     // For example: a is our huge number in base `f` and we are going to convert that number to base `t`
-//     if (f == t) {
-//         printf("%s", a);
-//         return;
-//     }
-//     int len = strlen(a);
-//     char *result = (char *)malloc(1000000);
-//     strrev(result);
-//     printf("%s", result);
-// }
-
-/* Determine if a 64 bit unsigned interger is overflow */
-bool is_overflow(uint64_t input_val) {
-	size_t msb = (size_t) log2(input_val);
-
-    printf("msb: %zu\n", msb);
-
-	return (msb < 63) ? 0 : 1;
+char* trim(char* str) {
+    char* end;
+    while(isspace((unsigned char)*str)) str++;
+    if(*str == 0) return str;
+    end = str + strlen(str) - 1;
+    while(end > str && isspace((unsigned char)*end)) end--;
+    end[1] = '\0';
+    return str;
 }
 
-/* Generates and return a 64 bit *common* */
-uint64_t pre_process(char *input, const int size, const int from) {
-	uint64_t common = 0;
-	int i, base;
-	base = from;
 
-	/* (x= from char to int, y= from char(letter) to int) in Hex. */
-	int type, type_x, type_y = 'W';
-	type = type_x = '0';
-
-	strrev(input);
-	for(i = 0; i < size; i++) {
-		if(base == 16)
-			(!isdigit(input[i])) ? (type = type_y) : (type = type_x);
-		common = common + ((input[i] - type) * (pow(base, i)));
-	}
-
-    printf("===> %d\n", common);
-    printf("==> %"PRIu64"\n", common);
-
-	if(is_overflow(common)) {
-		fprintf(stderr, "core: number is too large\n");
-		return 0;
-	}
-
-	return common;
-}
-
-/* Processes *common* and return the size of output array*/
-int pos_process(char *output, uint64_t common, const int to) {
-	if(common == 0)
-		/* terminate with output = '0' when common is 0 */
-		return (output[0] = '0') != '0' ? 0 : 1;
-
-	int i, size, base = to;
-	bool ishex = (base != 16) ? 0 : 1;
-
-	for(i = 0, size = 0; common != 0; i++, size++) {
-		output[i] = (common % base) + '0';
-
-		if(ishex && ((output[i] - '0') > 9))
-			output[i] += 39; /* Magical mystery number */
-
-		common = common / base;
-	}
-
-	strrev(output);
-	output[size] = '\0';
-
-	return size; /* Return the size of array */
-}
 
 char *file_reads(char *filepath) {
 	FILE* file = fopen(filepath, "rb");
@@ -128,24 +66,333 @@ char *file_reads(char *filepath) {
 	return buffer;
 }
 
-/* External interface */
-int convert(const int from, const int to, char *input, char *output) {
-	int size = pos_process(output, 
-		pre_process(input, strlen(input), from), to);
+// Convert a huge number from base 10 to `to`
+// Convert a number from base 10 to base n
+// Writing a number P in base n is equivalent to finding the coefficients of successive powers of n such as
 
-	return size; /* Return the size of output[] */
+// P
+// =
+// c
+// 0
+// ⋅
+// n
+// 0
+// +
+// c
+// 1
+// ⋅
+// n
+// 1
+// +
+// c
+// 2
+// ⋅
+// n
+// 2
+// +
+// ... with 
+// c
+// 0
+// ,
+// c
+// 1
+// ,
+// c
+// 2
+// ...
+// the digits in the base n of P.
+
+// Let's illustrate this with an example. How to convert 1205 to 9 base ?
+
+// We start by writing the powers of 9. We stop at the power immediately greater than our number 1205: 
+// 1
+// (
+// 9
+// 0
+// )
+// ,
+// 9
+// (
+// 9
+// 1
+// )
+// ,
+// 81
+// (
+// 9
+// 2
+// )
+// ,
+// 729
+// (
+// 9
+// 3
+// )
+// ,
+// 6561
+// (
+// 9
+// 4
+// >
+// 1205
+// )
+
+
+// 9
+// 3
+// <
+// 1205
+// <
+// 9
+// 4
+// . So, 1205 will have 4 digits in base 9 and will be written as follows,
+
+// Equation (1):
+// 1205
+// =
+// a
+// 3
+// ⋅
+// 9
+// 3
+// +
+// a
+// 2
+// ⋅
+// 9
+// 2
+// +
+// a
+// 1
+// ⋅
+// 9
+// 1
+// +
+// a
+// 0
+// ⋅
+// 9
+// 0
+//  i.e. 1205 is represented by "
+// a
+// 3
+// a
+// 2
+// a
+// 1
+// a
+// 0
+// " in base 9 with,
+
+// a
+// 0
+// ,
+// a
+// 1
+// ,
+// a
+// 2
+// ,
+// a
+// 3
+//  digits from base 9 i.e. numbers from 0.1,... 7 and 8.
+
+// Equation (1) can be written in the form,
+
+// 1205
+// =
+// a
+// 3
+// ⋅
+// 9
+// 3
+// +
+// r
+//  with r < 
+// 9
+// 3
+//  does this remind you of anything ? this is the Euclidean division of 1205 by 
+// 9
+// 3
+//  i.e. 729.
+
+// By doing the Euclidean division, we get 1205 ÷ 729 = 1 remainder 476
+
+// So we have 
+// a
+// 3
+// =
+// 1
+//  and 
+// r
+// =
+// a
+// 2
+// ⋅
+// 9
+// 2
+// +
+// a
+// 1
+// ⋅
+// 9
+// 1
+// +
+// a
+// 0
+// ⋅
+// 9
+// 0
+// =
+// 476
+
+
+// Similarly, one can write,
+
+// 476
+// =
+// a
+// 2
+// ⋅
+// 9
+// 2
+// +
+// s
+//  with s < 
+// 9
+// 2
+// , similarly, this is the Euclidean division of 476 by 
+// 9
+// 2
+//  i.e. 81.
+
+// By doing the Euclidean division, we get 476 ÷ 81 = 5 remainder 71
+
+// We deduce 
+// a
+// 2
+// =
+// 5
+//  and 
+// s
+// =
+// a
+// 1
+// ⋅
+// 9
+// 1
+// +
+// a
+// 0
+// ⋅
+// 9
+// 0
+// =
+// 71
+
+
+// We reiterate the same process, 71 ÷ 9 = 7 remains 8, we deduce, 
+// a
+// 1
+//  = 7 and 
+// a
+// 0
+//  = 8
+
+// It has been proved successively,
+// a
+// 3
+// =
+// 1
+
+// a
+// 2
+// =
+// 5
+
+// a
+// 1
+// =
+// 7
+
+// a
+// 0
+// =
+// 8
+
+
+// 1205 in base 9 is written 1578 in base 9.
+
+// To summarize this method,
+
+// To convert a number P from base 10 to base n
+// - Write powers of n (target base)
+// - Frame P by 2 successive powers of n (by the way, this determines the number of digits of P in base n)
+// - Do the Euclidean division of P by the power of n identified in the previous step (lowest value of the two powers)
+// - The quotient of this division is equal to the first digit of P (starting from the left) in base n
+// - Repeat successively these divisions by using the remainder as the new dividend and the immediately lower power as divisor until reaching power 1 of n.
+
+int* str_to_int_array(char* str, int length) {
+    int* array = (int*)malloc(sizeof(int) * length);
+    int i = 0;
+    while (*str != '\0') {
+        array[i++] = *str - '0';
+        str++;
+    }
+    return array;
 }
 
-char* trim(char* str) {
-    char* end;
-    while(isspace((unsigned char)*str)) str++;
-    if(*str == 0) return str;
-    end = str + strlen(str) - 1;
-    while(end > str && isspace((unsigned char)*end)) end--;
-    end[1] = '\0';
-    return str;
-}
+void my_convert(char* input, int to) {
+    int len = strlen(input);
 
+    // Convert the input string to an array of integers
+    int* arr = str_to_int_array(input, len);
+
+    // Convert the input number from base 10 to base `to`
+    while (1) {
+        // Multiply the input number by `to`
+        for (j = 0; j < len; j++) {
+            temp = input_array[j] * to + carry;
+            input_array[j] = temp % 10;
+            carry = temp / 10;
+        }
+
+        // Store the remainder in the result array
+        while (carry > 0) {
+            input_array[len] = carry % 10;
+            carry = carry / 10;
+            len++;
+        }
+
+        // Store the result in the result array
+        for (k = 0; k < len; k++) {
+            result[index] = input_array[k];
+            index++;
+        }
+
+        // Check if the input number is 0
+        for (l = 0; l < len; l++) {
+            if (input_array[l] != 0) {
+                break;
+            }
+        }
+
+        // If the input number is 0, break the loop
+        if (l == len) {
+            break;
+        }
+
+        // Reset the input array
+        for (m = 0; m < len; m++) {
+            input_array[m] = 0;
+        }
+    }
+
+    // Print the result
+    for (n = index - 1; n >= 0; n--) {
+        printf("%d", result[n]);
+    }
+}
 
 int main(int argc, char** argv) {
     if(argc != 4 && argc != 5) {
@@ -178,15 +425,7 @@ int main(int argc, char** argv) {
     printf("To: %d\n", to);
 
     printf("Result: ");
-
-    // convert_base(number, from, to);
-
-    char output[1000000];
-    int size = convert(from, to, number, output);
-    for (int i = 0; i < size; i++) {
-        printf("%c", output[i]);
-    }
-
+    my_convert(number, to);
     printf("\n");
     
     return 0;
