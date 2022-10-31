@@ -342,6 +342,44 @@ int* str_to_int_array(char* str, int length) {
     return array;
 }
 
+// To return value of a char. For example, 2 is
+// returned for '2'.  10 is returned for 'A', 11
+// for 'B'
+int val(char c) {
+    if (c >= '0' && c <= '9') return (int)c - '0';
+    else return (int)c - 'A' + 10;
+}
+
+// Function to convert a number from given base 'b'
+// to decimal
+char *toDeci(char *str, int base) {
+    if (base == 10) return str;
+
+    int length = strlen(str);
+    int size = base < 10 ? length * length : length;
+    char *result = malloc(sizeof(char) * size + 1);
+
+    int power = 1; // Initialize power of base
+    int num = 0;  // Initialize result
+    int i;
+ 
+    // Decimal equivalent is str[len-1]*1 + str[len-2]*base + str[len-3]*(base^2) + ...
+    for (i = len - 1; i >= 0; i--) {
+        // A digit in input number must be less than number's base
+        if (val(str[i]) >= base) {
+           printf("Invalid Number");
+           return NULL;
+        }
+
+        result[i] = val(str[i]) * power;
+ 
+        num += val(str[i]) * power;
+        // power = power * base;
+    }
+ 
+    return num;
+}
+
 void my_convert(char* input, int to) {
     int len = strlen(input);
 
@@ -349,49 +387,7 @@ void my_convert(char* input, int to) {
     int* arr = str_to_int_array(input, len);
 
     // Convert the input number from base 10 to base `to`
-    while (1) {
-        // Multiply the input number by `to`
-        for (j = 0; j < len; j++) {
-            temp = input_array[j] * to + carry;
-            input_array[j] = temp % 10;
-            carry = temp / 10;
-        }
 
-        // Store the remainder in the result array
-        while (carry > 0) {
-            input_array[len] = carry % 10;
-            carry = carry / 10;
-            len++;
-        }
-
-        // Store the result in the result array
-        for (k = 0; k < len; k++) {
-            result[index] = input_array[k];
-            index++;
-        }
-
-        // Check if the input number is 0
-        for (l = 0; l < len; l++) {
-            if (input_array[l] != 0) {
-                break;
-            }
-        }
-
-        // If the input number is 0, break the loop
-        if (l == len) {
-            break;
-        }
-
-        // Reset the input array
-        for (m = 0; m < len; m++) {
-            input_array[m] = 0;
-        }
-    }
-
-    // Print the result
-    for (n = index - 1; n >= 0; n--) {
-        printf("%d", result[n]);
-    }
 }
 
 int main(int argc, char** argv) {
@@ -425,6 +421,14 @@ int main(int argc, char** argv) {
     printf("To: %d\n", to);
 
     printf("Result: ");
+
+    if (from != 10) {
+        int deci = toDeci(number, from);
+        printf("%d", deci);
+    } else {
+        my_convert(number, to);
+    }
+
     my_convert(number, to);
     printf("\n");
     
