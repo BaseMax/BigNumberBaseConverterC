@@ -356,28 +356,51 @@ char *toDeci(char *str, int base) {
     if (base == 10) return str;
 
     int length = strlen(str);
-    int size = base < 10 ? length * length : length;
+    int size = base < 10 ? (length * length) : length;
     char *result = malloc(sizeof(char) * size + 1);
+    int append = 0;
 
-    int power = 1; // Initialize power of base
-    int num = 0;  // Initialize result
-    int i;
- 
-    // Decimal equivalent is str[len-1]*1 + str[len-2]*base + str[len-3]*(base^2) + ...
-    for (i = len - 1; i >= 0; i--) {
-        // A digit in input number must be less than number's base
-        if (val(str[i]) >= base) {
-           printf("Invalid Number");
-           return NULL;
+    // Go through all digits of str[]
+    for (int i = 0; i < length; i++) {
+        int num = val(str[i]);
+        int j = 0;
+
+        // Multiply result by base and add
+        // current digit
+        while (j < append) {
+            result[j] *= base;
+            j++;
         }
 
-        result[i] = val(str[i]) * power;
- 
-        num += val(str[i]) * power;
-        // power = power * base;
+        result[j] += num;
+        j = 0;
+
+        // Fix digits of result
+        while (j < append) {
+            if (result[j] > 9) {
+                if (j + 1 < append) {
+                    result[j + 1] += result[j] / 10;
+                } else {
+                    result[j + 1] = result[j] / 10;
+                    append++;
+                }
+                result[j] %= 10;
+            }
+            j++;
+        }
+        append++;
     }
- 
-    return num;
+
+    // Convert the result from int array to char array
+    char *final = malloc(sizeof(char) * size + 1);
+    int i = 0;
+    while (i < append) {
+        final[i] = result[append - i - 1] + '0';
+        i++;
+    }
+    final[i] = '\0';
+    
+    return result;
 }
 
 void my_convert(char* input, int to) {
@@ -402,7 +425,7 @@ int main(int argc, char** argv) {
     int to;
 
     if (argc == 4) {
-        number = argv[1];
+        number = trim(argv[1]);
         from = atoi(argv[2]);
         to = atoi(argv[3]);
     } else if (argc == 5) {
@@ -423,8 +446,8 @@ int main(int argc, char** argv) {
     printf("Result: ");
 
     if (from != 10) {
-        int deci = toDeci(number, from);
-        printf("%d", deci);
+        char* num10 = toDeci(number, from);
+        printf("New Number in base 10: %s\n", num10);
     } else {
         my_convert(number, to);
     }
