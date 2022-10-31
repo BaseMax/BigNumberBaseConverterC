@@ -7,8 +7,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h> // strrev, strlen
 #include <ctype.h> // isspace
+#include <inttypes.h>
+#include <math.h>
 
 void my_strrev(char *str) {
     int i = strlen(str) - 1, j = 0;
@@ -23,41 +26,72 @@ void my_strrev(char *str) {
 }
 
 // Convert number `a` from base `f` to base `t`
-void convert_base(char* a, int f, int t) {
-    int i;
-    int len = strlen(a);
-    int num = 0;
-    for(i = 0; i < len; i++) {
-        if(a[i] >= '0' && a[i] <= '9') {
-            num = num * f + (a[i] - '0');
-        }
-        else if(a[i] >= 'A' && a[i] <= 'Z') {
-            num = num * f + (a[i] - 'A' + 10);
-        }
-        else if(a[i] >= 'a' && a[i] <= 'z') {
-            num = num * f + (a[i] - 'a' + 10);
-        }
-    }
+// void convert_base(char* a, int f, int t) {
+//     // For example: a is our huge number in base `f` and we are going to convert that number to base `t`
+//     if (f == t) {
+//         printf("%s", a);
+//         return;
+//     }
+//     int len = strlen(a);
+//     char *result = (char *)malloc(1000000);
+//     strrev(result);
+//     printf("%s", result);
+// }
 
-    // TODO: We need to determine the size of the array
-    int size = (int) strlen(a) * (t / f);
-    char *res = (char*)malloc(sizeof(char) * size);
-    int j = 0;
-    while(num != 0) {
-        int r = num % t;
-        if(r >= 0 && r <= 9) {
-            res[j++] = r + '0';
-        }
-        else {
-            res[j++] = r - 10 + 'A';
-        }
-        num = num / t;
-    }
-    res[j] = '\0';
+/* Determine if a 64 bit unsigned interger is overflow */
+bool is_overflow(uint64_t input_val) {
+	size_t msb = (size_t) log2(input_val);
 
-    strrev(res);
+	return (msb < 63) ? 0 : 1;
+}
 
-    printf("%s", res);
+/* Generates and return a 64 bit *common* */
+uint64_t pre_process(char *input, const int size, const int from) {
+	uint64_t common = 0;
+	int i, base;
+	base = from;
+
+	/* (x= from char to int, y= from char(letter) to int) in Hex. */
+	int type, type_x, type_y = 'W';
+	type = type_x = '0';
+
+	strrev(input);
+	for(i = 0; i < size; i++) {
+		if(base == 16)
+			(!isdigit(input[i])) ? (type = type_y) : (type = type_x);
+		common = common + ((input[i] - type) * (pow(base, i)));
+	}
+	
+	if(is_overflow(common)) {
+		fprintf(stderr, "core: number is too large\n");
+		return 0;
+	}
+
+	return common;
+}
+
+/* Processes *common* and return the size of output array*/
+int pos_process(char *output, uint64_t common, const int to) {
+	if(common == 0)
+		/* terminate with output = '0' when common is 0 */
+		return (output[0] = '0') != '0' ? 0 : 1;
+
+	int i, size, base = to;
+	bool ishex = (base != 16) ? 0 : 1;
+
+	for(i = 0, size = 0; common != 0; i++, size++) {
+		output[i] = (common % base) + '0';
+
+		if(ishex && ((output[i] - '0') > 9))
+			output[i] += 39; /* Magical mystery number */
+
+		common = common / base;
+	}
+
+	strrev(output);
+	output[size] = '\0';
+
+	return size; /* Return the size of array */
 }
 
 char *file_reads(char *filepath) {
@@ -87,6 +121,14 @@ char *file_reads(char *filepath) {
 
 	fclose(file);
 	return buffer;
+}
+
+/* External interface */
+int convert(const int from, const int to, char *input, char *output) {
+	int size = pos_process(output, 
+		pre_process(input, strlen(input), from), to);
+
+	return size; /* Return the size of output[] */
 }
 
 char* trim(char* str) {
@@ -131,7 +173,15 @@ int main(int argc, char** argv) {
     printf("To: %d\n", to);
 
     printf("Result: ");
-    convert_base(number, from, to);
+
+    // convert_base(number, from, to);
+
+    char output[1000000];
+    int size = convert(from, to, number, output);
+    for (int i = 0; i < size; i++) {
+        printf("%c", output[i]);
+    }
+
     printf("\n");
     
     return 0;
