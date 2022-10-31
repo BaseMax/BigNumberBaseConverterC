@@ -59,15 +59,47 @@ void convert_base(char* a, int f, int t) {
     printf("%s", res);
 }
 
+char *file_reads(char *filename) {
+    FILE *file = fopen(filename, "r");
+    if(file == NULL) {
+        printf("Error: File not found: %s\n", filename);
+        exit(1);
+    }
+
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char *buffer = malloc(length);
+    if(buffer) {
+        fread(buffer, 1, length, file);
+    }
+
+    fclose(file);
+
+    return buffer;
+}
+
 int main(int argc, char** argv) {
-    if(argc < 4) {
+    if(argc < 4 || argc < 5) {
         printf("Usage: %s [number] [from] [to]\n", argv[0]);
+        printf("Usage: %s -f [file] [from] [to]\n", argv[0]);
         return 1;
     }
 
-    char* number = argv[1];
-    int from = atoi(argv[2]);
-    int to = atoi(argv[3]);
+    char* number;
+    int from;
+    int to;
+
+    if (argc == 4) {
+        number = argv[1];
+        from = atoi(argv[2]);
+        to = atoi(argv[3]);
+    } else if (argc == 5) {
+        number = file_reads(argv[2]);
+        from = atoi(argv[3]);
+        to = atoi(argv[4]);
+    }
 
     printf("Number: %s\n", number);
     printf("From: %d\n", from);
