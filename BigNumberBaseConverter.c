@@ -58,3 +58,24 @@ void convert_base(char* a, int f, int t) {
 
     printf("%s", res);
 }
+
+int main(int argc, char** argv) {
+    if(argc < 4) {
+        printf("Usage: %s [number] [from] [to]\n", argv[0]);
+        return 1;
+    }
+
+    char* number = argv[1];
+    int from = atoi(argv[2]);
+    int to = atoi(argv[3]);
+
+    printf("Number: %s\n", number);
+    printf("From: %d\n", from);
+    printf("To: %d\n", to);
+
+    printf("Result: ");
+    convert_base(number, from, to);
+    printf("\n");
+    
+    return 0;
+}
