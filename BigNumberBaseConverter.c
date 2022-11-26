@@ -48,7 +48,7 @@ void printBigNumber(BigNumber *number) {
     printf("\n");
 }
 
-void my_strrev(char *str) {
+void stringReverse(char *str) {
     int i = strlen(str) - 1, j = 0;
     char ch;
     while (i > j) {
@@ -60,12 +60,12 @@ void my_strrev(char *str) {
     }
 }
 
-char* trim(char* str) {
+char* stringTrim(char* str) {
     char* end;
-    while(isspace((unsigned char)*str)) str++;
-    if(*str == 0) return str;
+    while (isspace((unsigned char)*str)) str++;
+    if (*str == 0) return str;
     end = str + strlen(str) - 1;
-    while(end > str && isspace((unsigned char)*end)) end--;
+    while (end > str && isspace((unsigned char)*end)) end--;
     end[1] = '\0';
     return str;
 }
@@ -119,59 +119,87 @@ int val(char c) {
 }
 
 // Function to caclulate modulu of two large number
-char* bignumber_mod(int* number1, int length1, int* number2, int length2, int* resultLength) {
-    // As result can be very large store it in string
-    char* result = (char*)malloc(sizeof(char) * length1);
-    int i = 0;
-    int temp = number1[i];
-    while (temp < length2) temp = temp * 10 + number1[++i];
-    while (length1 > i) {
-        // Store result in result i.e. temp / length2
-        result[i] = (temp / length2) + '0';
-        i++;
-        // Take next digit of number
-        temp = (temp % length2) * 10 + number1[i];
+BigNumber* ModBigNumber(BigNumber* number1, BigNumber* number2) {
+    BigNumber *result = createBigNumber(1);
+    int mod = 0;
+    for (int i = number1->size - 1; i >= 0; i--) {
+        mod = mod * 10 + number1->digits[i];
+        appendBigNumber(result, mod / number2->digits[0]);
+        mod = mod % number2->digits[0];
     }
-    // Store result in result
-    result[i] = (temp / length2) + '0';
-    i++;
-    result[i] = '\0'; // Append string terminator
-    // If remainder is 0, then store 0 in result
-    // As result is integer, convert it into string
-    if (temp % length2 == 0) {
-        *resultLength = i;
-        return result;
-    }
-    // If remainder is non-zero, then store remainder
-    // in result
-    // As result is integer, convert it into string
-    char* result2 = (char*)malloc(sizeof(char) * length1);
-    sprintf(result2, "%d", temp % length2);
-    *resultLength = strlen(result2);
-    return result2;
-}
-
-// Function to calculate and return the divide of two large numbers
-int* bignumber_divide(int* number1, int length1, int* number2, int length2, int* resultLength) {
-    int* result = (int*)malloc(sizeof(int) * 1000);
-    int i = 0, temp = 0;
-    while (i < length1) {
-        temp = temp * 10 + number1[i];
-        if (temp < number2[0]) {
-            if (i != 0) {
-                result[i] = 0;
-                i++;
-            }
-        } else {
-            result[i] = temp / number2[0];
-            temp = temp % number2[0];
-            i++;
-        }
-    }
-    result[i] = '\0';
-    *resultLength = i;
     return result;
 }
+
+// char* bignumber_mod(int* number1, int length1, int* number2, int length2, int* resultLength) {
+//     // As result can be very large store it in string
+//     char* result = (char*)malloc(sizeof(char) * length1);
+//     int i = 0;
+//     int temp = number1[i];
+//     while (temp < length2) temp = temp * 10 + number1[++i];
+//     while (length1 > i) {
+//         // Store result in result i.e. temp / length2
+//         result[i] = (temp / length2) + '0';
+//         i++;
+//         // Take next digit of number
+//         temp = (temp % length2) * 10 + number1[i];
+//     }
+//     // Store result in result
+//     result[i] = (temp / length2) + '0';
+//     i++;
+//     result[i] = '\0'; // Append string terminator
+//     // If remainder is 0, then store 0 in result
+//     // As result is integer, convert it into string
+//     if (temp % length2 == 0) {
+//         *resultLength = i;
+//         return result;
+//     }
+//     // If remainder is non-zero, then store remainder
+//     // in result
+//     // As result is integer, convert it into string
+//     char* result2 = (char*)malloc(sizeof(char) * length1);
+//     sprintf(result2, "%d", temp % length2);
+//     *resultLength = strlen(result2);
+//     return result2;
+// }
+
+BigNumber* BigNumberDiv(BigNumber* number1, BigNumber* number2) {
+    BigNumber *result = createBigNumber(1);
+    BigNumber *temp = createBigNumber(number1->size);
+    int idx = 0;
+    int temp2 = number1->digits[number1->size - 1];
+    while (temp2 < number2->digits[0]) temp2 = temp2 * 10 + number1->digits[--idx];
+    while (number1->size > idx) {
+        appendBigNumber(temp, temp2 / number2->digits[0]);
+        idx++;
+        if (idx == number1->size) break;
+        temp2 = (temp2 % number2->digits[0]) * 10 + number1->digits[idx];
+    }
+    if (temp2 % number2->digits[0] == 0) {
+        return temp;
+    }
+    return temp;
+}
+// Function to calculate and return the divide of two large numbers
+// int* bignumber_divide(int* number1, int length1, int* number2, int length2, int* resultLength) {
+//     int* result = (int*)malloc(sizeof(int) * 1000);
+//     int i = 0, temp = 0;
+//     while (i < length1) {
+//         temp = temp * 10 + number1[i];
+//         if (temp < number2[0]) {
+//             if (i != 0) {
+//                 result[i] = 0;
+//                 i++;
+//             }
+//         } else {
+//             result[i] = temp / number2[0];
+//             temp = temp % number2[0];
+//             i++;
+//         }
+//     }
+//     result[i] = '\0';
+//     *resultLength = i;
+//     return result;
+// }
 
 //  Convert a positive number `number` to its digit representation in base `n`.
 int* convert_base10_to_n(int* number, int length, int* resultLength, int new_base) {
@@ -202,7 +230,7 @@ void my_convert(char* input, int to) {
 }
 
 int main(int argc, char** argv) {
-    if(argc != 4 && argc != 5) {
+    if (argc != 4 && argc != 5) {
         printf("Usage: %s [number] [from] [to]\n", argv[0]);
         printf("Usage: %s -f [file] [from] [to]\n", argv[0]);
         return 1;
