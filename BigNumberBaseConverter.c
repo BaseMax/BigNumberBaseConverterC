@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h> // strrev, strlen
 #include <ctype.h> // isspace
 #include <math.h> // pow
@@ -257,7 +256,7 @@ int BigNumberCompare(BigNumber* number1, BigNumber* number2) {
 BigNumber* convertBase10ToN(BigNumber* number, int n) {
     BigNumber *digits = BigNumberCreate(number->capacity);
     BigNumber *temp = copyBigNumber(number);
-    while (true) {
+    while (1) {
         BigNumber *mod = BigNumberMod(temp, n);
         BigNumberAppendEnd(digits, BigNumberGetNumber(mod));
         temp = BigNumberDiv(temp, n);
