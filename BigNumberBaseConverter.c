@@ -64,17 +64,6 @@ char *file_reads(char *filepath) {
 	return buffer;
 }
 
-// Convert a huge number from base 10 to `to`
-// Convert a number from base 10 to base n
-// Writing a number P in base n is equivalent to finding the coefficients of successive powers of n such as
-
-// To summarize this method, to convert a number P from base 10 to base n:
-// - Write powers of n (target base)
-// - Frame P by 2 successive powers of n (by the way, this determines the number of digits of P in base n)
-// - Do the Euclidean division of P by the power of n identified in the previous step (lowest value of the two powers)
-// - The quotient of this division is equal to the first digit of P (starting from the left) in base n
-// - Repeat successively these divisions by using the remainder as the new dividend and the immediately lower power as divisor until reaching power 1 of n.
-
 int* str_to_int_array(char* str, int length) {
     int* array = (int*)malloc(sizeof(int) * length);
     int i = 0;
@@ -94,51 +83,80 @@ int val(char c) {
     else return (int)c - 'A' + 10;
 }
 
-// Function to convert a number from given base 'b'
-// to decimal
-// char *toDeci(char *str, int base) {
-//     if (base == 10) return str;
+// Function to caclulate modulu of two large number
+char* bignumber_mod(int* number1, int length1, int* number2, int length2, int* resultLength) {
+    // As result can be very large store it in string
+    char* result = (char*)malloc(sizeof(char) * length1);
+    int i = 0;
+    int temp = number1[i];
+    while (temp < length2) temp = temp * 10 + number1[++i];
+    while (length1 > i) {
+        // Store result in result i.e. temp / length2
+        result[i] = (temp / length2) + '0';
+        i++;
+        // Take next digit of number
+        temp = (temp % length2) * 10 + number1[i];
+    }
+    // Store result in result
+    result[i] = (temp / length2) + '0';
+    i++;
+    result[i] = '\0'; // Append string terminator
+    // If remainder is 0, then store 0 in result
+    // As result is integer, convert it into string
+    if (temp % length2 == 0) {
+        *resultLength = i;
+        return result;
+    }
+    // If remainder is non-zero, then store remainder
+    // in result
+    // As result is integer, convert it into string
+    char* result2 = (char*)malloc(sizeof(char) * length1);
+    sprintf(result2, "%d", temp % length2);
+    *resultLength = strlen(result2);
+    return result2;
+}
 
-//     int length = strlen(str);
-//     int size = base < 10 ? (length * length) : length;
-//     char *result = malloc(sizeof(char) * size + 1);
-//     int append = 0;
+// Function to calculate and return the divide of two large numbers
+int* bignumber_divide(int* number1, int length1, int* number2, int length2, int* resultLength) {
+    int* result = (int*)malloc(sizeof(int) * 1000);
+    int i = 0, temp = 0;
+    while (i < length1) {
+        temp = temp * 10 + number1[i];
+        if (temp < number2[0]) {
+            if (i != 0) {
+                result[i] = 0;
+                i++;
+            }
+        } else {
+            result[i] = temp / number2[0];
+            temp = temp % number2[0];
+            i++;
+        }
+    }
+    result[i] = '\0';
+    *resultLength = i;
+    return result;
+}
 
-//     // Go through all digits of str[]
-//     for (int i = 0; i < length; i++) {
-//         int num = val(str[i]);
-//         int j = 0;
-
-//         // Multiply result by base and add
-//         // current digit
-//         while (j < append) {
-//             result[j] *= base;
-//             j++;
-//         }
-
-//         result[j] += num;
-//         j = 0;
-
-//         // Fix digits of result
-//         while (j < append) {
-//             if (result[j] > 9) {
-//                 if (j + 1 < append) {
-//                     result[j + 1] += result[j] / 10;
-//                 } else {
-//                     result[j + 1] = result[j] / 10;
-//                     append++;
-//                 }
-//                 result[j] %= 10;
-//             }
-//             j++;
-//         }
-//         append++;
-//     }
-
-//     result[append] = '\0';
-    
-//     return result;
-// }
+//  Convert a positive number `number` to its digit representation in base `n`.
+int* convert_base10_to_n(int* number, int length, int* resultLength, int new_base) {
+    int* result = (int*)malloc(sizeof(int) * 1000);
+    int i = 0;
+    while (true) {
+        int* temp = bignumber_divide(number, length, &new_base, 1, &length);
+        int* temp2 = bignumber_mod(number, length, &new_base, 1, &length);
+        result[i] = temp2[0];
+        i++;
+        if (length == 1 && temp[0] == 0) {
+            break;
+        }
+        number = temp;
+    }
+    // digits = []
+    // while n > 0:
+    //     digits.insert(0, n % b)
+    //     n  = n // b
+}
 
 void my_convert(char* input, int to) {
     int len = strlen(input);
