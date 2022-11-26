@@ -99,7 +99,7 @@ char *file_reads(char *filepath) {
 	return buffer;
 }
 
-int* str_to_int_array(char* str, int length) {
+int* convertString2Array(char* str, int length) {
     int* array = (int*)malloc(sizeof(int) * length);
     int i = 0;
     while (*str != '\0') {
@@ -110,10 +110,8 @@ int* str_to_int_array(char* str, int length) {
     return array;
 }
 
-// To return value of a char. For example, 2 is
-// returned for '2'.  10 is returned for 'A', 11
-// for 'B'
-int val(char c) {
+// To return value of a char. For example, 2 is returned for '2'.  10 is returned for 'A', 11 for 'B'
+int convertCharToInt(char c) {
     if (c >= '0' && c <= '9') return (int)c - '0';
     else return (int)c - 'A' + 10;
 }
@@ -130,38 +128,7 @@ BigNumber* ModBigNumber(BigNumber* number1, BigNumber* number2) {
     return result;
 }
 
-// char* bignumber_mod(int* number1, int length1, int* number2, int length2, int* resultLength) {
-//     // As result can be very large store it in string
-//     char* result = (char*)malloc(sizeof(char) * length1);
-//     int i = 0;
-//     int temp = number1[i];
-//     while (temp < length2) temp = temp * 10 + number1[++i];
-//     while (length1 > i) {
-//         // Store result in result i.e. temp / length2
-//         result[i] = (temp / length2) + '0';
-//         i++;
-//         // Take next digit of number
-//         temp = (temp % length2) * 10 + number1[i];
-//     }
-//     // Store result in result
-//     result[i] = (temp / length2) + '0';
-//     i++;
-//     result[i] = '\0'; // Append string terminator
-//     // If remainder is 0, then store 0 in result
-//     // As result is integer, convert it into string
-//     if (temp % length2 == 0) {
-//         *resultLength = i;
-//         return result;
-//     }
-//     // If remainder is non-zero, then store remainder
-//     // in result
-//     // As result is integer, convert it into string
-//     char* result2 = (char*)malloc(sizeof(char) * length1);
-//     sprintf(result2, "%d", temp % length2);
-//     *resultLength = strlen(result2);
-//     return result2;
-// }
-
+// Function to caclulate division of two large number
 BigNumber* BigNumberDiv(BigNumber* number1, BigNumber* number2) {
     BigNumber *result = createBigNumber(1);
     BigNumber *temp = createBigNumber(number1->size);
@@ -179,27 +146,6 @@ BigNumber* BigNumberDiv(BigNumber* number1, BigNumber* number2) {
     }
     return temp;
 }
-// Function to calculate and return the divide of two large numbers
-// int* bignumber_divide(int* number1, int length1, int* number2, int length2, int* resultLength) {
-//     int* result = (int*)malloc(sizeof(int) * 1000);
-//     int i = 0, temp = 0;
-//     while (i < length1) {
-//         temp = temp * 10 + number1[i];
-//         if (temp < number2[0]) {
-//             if (i != 0) {
-//                 result[i] = 0;
-//                 i++;
-//             }
-//         } else {
-//             result[i] = temp / number2[0];
-//             temp = temp % number2[0];
-//             i++;
-//         }
-//     }
-//     result[i] = '\0';
-//     *resultLength = i;
-//     return result;
-// }
 
 //  Convert a positive number `number` to its digit representation in base `n`.
 int* convert_base10_to_n(int* number, int length, int* resultLength, int new_base) {
