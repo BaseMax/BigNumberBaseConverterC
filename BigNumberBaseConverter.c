@@ -10,8 +10,7 @@
 #include <stdbool.h>
 #include <string.h> // strrev, strlen
 #include <ctype.h> // isspace
-#include <inttypes.h>
-#include <math.h>
+#include <math.h> // pow
 
 // A structure to store big numbers in an array
 typedef struct {
