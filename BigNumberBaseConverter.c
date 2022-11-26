@@ -35,8 +35,6 @@ char* trim(char* str) {
     return str;
 }
 
-
-
 char *file_reads(char *filepath) {
 	FILE* file = fopen(filepath, "rb");
 	if (file == NULL) {
@@ -70,262 +68,7 @@ char *file_reads(char *filepath) {
 // Convert a number from base 10 to base n
 // Writing a number P in base n is equivalent to finding the coefficients of successive powers of n such as
 
-// P
-// =
-// c
-// 0
-// ⋅
-// n
-// 0
-// +
-// c
-// 1
-// ⋅
-// n
-// 1
-// +
-// c
-// 2
-// ⋅
-// n
-// 2
-// +
-// ... with 
-// c
-// 0
-// ,
-// c
-// 1
-// ,
-// c
-// 2
-// ...
-// the digits in the base n of P.
-
-// Let's illustrate this with an example. How to convert 1205 to 9 base ?
-
-// We start by writing the powers of 9. We stop at the power immediately greater than our number 1205: 
-// 1
-// (
-// 9
-// 0
-// )
-// ,
-// 9
-// (
-// 9
-// 1
-// )
-// ,
-// 81
-// (
-// 9
-// 2
-// )
-// ,
-// 729
-// (
-// 9
-// 3
-// )
-// ,
-// 6561
-// (
-// 9
-// 4
-// >
-// 1205
-// )
-
-
-// 9
-// 3
-// <
-// 1205
-// <
-// 9
-// 4
-// . So, 1205 will have 4 digits in base 9 and will be written as follows,
-
-// Equation (1):
-// 1205
-// =
-// a
-// 3
-// ⋅
-// 9
-// 3
-// +
-// a
-// 2
-// ⋅
-// 9
-// 2
-// +
-// a
-// 1
-// ⋅
-// 9
-// 1
-// +
-// a
-// 0
-// ⋅
-// 9
-// 0
-//  i.e. 1205 is represented by "
-// a
-// 3
-// a
-// 2
-// a
-// 1
-// a
-// 0
-// " in base 9 with,
-
-// a
-// 0
-// ,
-// a
-// 1
-// ,
-// a
-// 2
-// ,
-// a
-// 3
-//  digits from base 9 i.e. numbers from 0.1,... 7 and 8.
-
-// Equation (1) can be written in the form,
-
-// 1205
-// =
-// a
-// 3
-// ⋅
-// 9
-// 3
-// +
-// r
-//  with r < 
-// 9
-// 3
-//  does this remind you of anything ? this is the Euclidean division of 1205 by 
-// 9
-// 3
-//  i.e. 729.
-
-// By doing the Euclidean division, we get 1205 ÷ 729 = 1 remainder 476
-
-// So we have 
-// a
-// 3
-// =
-// 1
-//  and 
-// r
-// =
-// a
-// 2
-// ⋅
-// 9
-// 2
-// +
-// a
-// 1
-// ⋅
-// 9
-// 1
-// +
-// a
-// 0
-// ⋅
-// 9
-// 0
-// =
-// 476
-
-
-// Similarly, one can write,
-
-// 476
-// =
-// a
-// 2
-// ⋅
-// 9
-// 2
-// +
-// s
-//  with s < 
-// 9
-// 2
-// , similarly, this is the Euclidean division of 476 by 
-// 9
-// 2
-//  i.e. 81.
-
-// By doing the Euclidean division, we get 476 ÷ 81 = 5 remainder 71
-
-// We deduce 
-// a
-// 2
-// =
-// 5
-//  and 
-// s
-// =
-// a
-// 1
-// ⋅
-// 9
-// 1
-// +
-// a
-// 0
-// ⋅
-// 9
-// 0
-// =
-// 71
-
-
-// We reiterate the same process, 71 ÷ 9 = 7 remains 8, we deduce, 
-// a
-// 1
-//  = 7 and 
-// a
-// 0
-//  = 8
-
-// It has been proved successively,
-// a
-// 3
-// =
-// 1
-
-// a
-// 2
-// =
-// 5
-
-// a
-// 1
-// =
-// 7
-
-// a
-// 0
-// =
-// 8
-
-
-// 1205 in base 9 is written 1578 in base 9.
-
-// To summarize this method,
-
-// To convert a number P from base 10 to base n
+// To summarize this method, to convert a number P from base 10 to base n:
 // - Write powers of n (target base)
 // - Frame P by 2 successive powers of n (by the way, this determines the number of digits of P in base n)
 // - Do the Euclidean division of P by the power of n identified in the previous step (lowest value of the two powers)
@@ -339,6 +82,7 @@ int* str_to_int_array(char* str, int length) {
         array[i++] = *str - '0';
         str++;
     }
+    array[i] = '\0';
     return array;
 }
 
@@ -352,58 +96,56 @@ int val(char c) {
 
 // Function to convert a number from given base 'b'
 // to decimal
-char *toDeci(char *str, int base) {
-    if (base == 10) return str;
+// char *toDeci(char *str, int base) {
+//     if (base == 10) return str;
 
-    int length = strlen(str);
-    int size = base < 10 ? (length * length) : length;
-    char *result = malloc(sizeof(char) * size + 1);
-    int append = 0;
+//     int length = strlen(str);
+//     int size = base < 10 ? (length * length) : length;
+//     char *result = malloc(sizeof(char) * size + 1);
+//     int append = 0;
 
-    // Go through all digits of str[]
-    for (int i = 0; i < length; i++) {
-        int num = val(str[i]);
-        int j = 0;
+//     // Go through all digits of str[]
+//     for (int i = 0; i < length; i++) {
+//         int num = val(str[i]);
+//         int j = 0;
 
-        // Multiply result by base and add
-        // current digit
-        while (j < append) {
-            result[j] *= base;
-            j++;
-        }
+//         // Multiply result by base and add
+//         // current digit
+//         while (j < append) {
+//             result[j] *= base;
+//             j++;
+//         }
 
-        result[j] += num;
-        j = 0;
+//         result[j] += num;
+//         j = 0;
 
-        // Fix digits of result
-        while (j < append) {
-            if (result[j] > 9) {
-                if (j + 1 < append) {
-                    result[j + 1] += result[j] / 10;
-                } else {
-                    result[j + 1] = result[j] / 10;
-                    append++;
-                }
-                result[j] %= 10;
-            }
-            j++;
-        }
-        append++;
-    }
+//         // Fix digits of result
+//         while (j < append) {
+//             if (result[j] > 9) {
+//                 if (j + 1 < append) {
+//                     result[j + 1] += result[j] / 10;
+//                 } else {
+//                     result[j + 1] = result[j] / 10;
+//                     append++;
+//                 }
+//                 result[j] %= 10;
+//             }
+//             j++;
+//         }
+//         append++;
+//     }
 
-    result[append] = '\0';
+//     result[append] = '\0';
     
-    return result;
-}
+//     return result;
+// }
 
 void my_convert(char* input, int to) {
     int len = strlen(input);
 
     // Convert the input string to an array of integers
     int* arr = str_to_int_array(input, len);
-
-    // Convert the input number from base 10 to base `to`
-
+    printf("\n");
 }
 
 int main(int argc, char** argv) {
@@ -438,12 +180,12 @@ int main(int argc, char** argv) {
 
     printf("Result: ");
 
-    if (from != 10) {
-        char* num10 = toDeci(number, from);
-        printf("New Number in base 10: %s\n", num10);
-    } else {
-        my_convert(number, to);
-    }
+    // if (from != 10) {
+    //     char* num10 = toDeci(number, from);
+    //     printf("New Number in base 10: %s\n", num10);
+    // } else {
+    //     my_convert(number, to);
+    // }
 
     my_convert(number, to);
     printf("\n");
