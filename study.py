@@ -36,7 +36,7 @@ def convertBase(digits, b, c):
 # [1, 0, 1, 0, 1, 0]
 
 # print(toDigits(1100, 4))
-print(toDigits(1100, 60))
+# print(toDigits(1100, 60))
 
 # list = ["a", "b", "c"]
 # list.insert(0, "d")
@@ -45,5 +45,5 @@ print(toDigits(1100, 60))
 # print(list)
 
 print(1100 % 60)
-# print(1100 // 60)
-print(18 % 60)
+print(1100 // 60)
+# print(18 % 60)
