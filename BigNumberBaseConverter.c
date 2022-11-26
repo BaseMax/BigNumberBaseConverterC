@@ -20,6 +20,18 @@ typedef struct {
     int capacity;
 } BigNumber;
 
+// Function to convert a character to its digit representation
+int convertCharToInt(char c) {
+    if (c >= '0' && c <= '9') return (int)(c - '0');
+    else return (int)(c - 'A' + 10);
+}
+
+// Function to convert a digit to its character representation
+char convertIntToChar(int n) {
+    if (n >= 0 && n <= 9) return (char)(n + '0');
+    else return (char)(n - 10 + 'A');
+}
+
 // Function to create a new empty BigNumber with a given capacity
 BigNumber* BigNumberCreate(int capacity) {
     BigNumber *number = (BigNumber*) malloc(sizeof(BigNumber));
@@ -91,8 +103,16 @@ void BigNumberFree(BigNumber *number) {
     free(number);
 }
 
+// Function to print a BigNumber in charachter form
+void BigNumberPrintString(BigNumber *number) {
+    for (int i = number->size - 1; i >= 0; i--) {
+        printf("%c", convertIntToChar(number->digits[i]));
+    }
+    printf("\n");
+}
+
 // Function to print a BigNumber
-void printBigNumber(BigNumber *number) {
+void BigNumberPrint(BigNumber *number) {
     for (int i = number->size - 1; i >= 0; i--) {
         printf("%d", number->digits[i]);
         if (i != 0) {
@@ -164,12 +184,6 @@ char *fileReads(char *filepath) {
 
 	fclose(file);
 	return buffer;
-}
-
-// To return value of a char. For example, 2 is returned for '2'.  10 is returned for 'A', 11 for 'B'
-int convertCharToInt(char c) {
-    if (c >= '0' && c <= '9') return (int)c - '0';
-    else return (int) c - 'A' + 10;
 }
 
 // Function to calculate modulu of two large number
@@ -284,8 +298,11 @@ int main(int argc, char** argv) {
 
     number_n = convertBase10ToN(number_10, to);
 
+    printf("Result digits: ");
+    BigNumberPrint(number_n);
+
     printf("Result: ");
-    printBigNumber(number_n);
+    BigNumberPrintString(number_n);
     
     return 0;
 }
