@@ -28,8 +28,15 @@ int convertCharToInt(char c) {
 
 // Function to convert a digit to its character representation
 char convertIntToChar(int n) {
+    // 0 => 0
+    // 9 => 9
+    // 10 => a
+    // 35 => z
+    // 36 => A
+    // 61 => Z
     if (n >= 0 && n <= 9) return (char)(n + '0');
-    else return (char)(n - 10 + 'A');
+    else if (n >= 10 && n <= 35) return (char)(n - 10 + 'a');
+    else return (char)(n - 36 + 'A');
 }
 
 // Function to create a new empty BigNumber with a given capacity
