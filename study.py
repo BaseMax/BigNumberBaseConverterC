@@ -33,3 +33,11 @@ def convertBase(digits, b, c):
 
 print(toDigits(42, 2))
 # [1, 0, 1, 0, 1, 0]
+
+
+list = ["a", "b", "c"]
+
+list.insert(0, "d")
+list.insert(3, "e")
+list.insert(0, "x")
+print(list)

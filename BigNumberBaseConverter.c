@@ -29,6 +29,16 @@ BigNumber* createBigNumber(int capacity) {
     return number;
 }
 
+// Function to deep copy a BigNumber
+BigNumber* copyBigNumber(BigNumber *number) {
+    BigNumber *copy = createBigNumber(number->capacity);
+    for (int i = 0; i < number->size; i++) {
+        copy->digits[i] = number->digits[i];
+    }
+    copy->size = number->size;
+    return copy;
+}
+
 // Function to create a new BigNumber from a string
 BigNumber* stringToBigNumber(char *string) {
     int length = strlen(string);
@@ -39,8 +49,28 @@ BigNumber* stringToBigNumber(char *string) {
     return number;
 }
 
-// Function to add a new digit to the big number
-void appendBigNumber(BigNumber *number, int digit) {
+// Function to create a new BigNumber from a int
+BigNumber* intToBigNumber(int number) {
+    char string[100];
+    sprintf(string, "%d", number);
+    return stringToBigNumber(string);
+}
+
+// Function to add a new digit at the beginning of a BigNumber
+void appendBeginBigNumber(BigNumber *number, int digit) {
+    if (number->size == number->capacity) {
+        number->capacity *= 2;
+        number->digits = (int*) realloc(number->digits, sizeof(int) * number->capacity);
+    }
+    for (int i = number->size; i > 0; i--) {
+        number->digits[i] = number->digits[i - 1];
+    }
+    number->digits[0] = digit;
+    number->size++;
+}
+
+// Function to add a new digit at the end of a big number
+void appendEndBigNumber(BigNumber *number, int digit) {
     if (number->size == number->capacity) {
         number->capacity *= 2;
         number->digits = (int*) realloc(number->digits, sizeof(int) * number->capacity);
@@ -128,7 +158,7 @@ BigNumber* ModBigNumber(BigNumber* number1, BigNumber* number2) {
     int mod = 0;
     for (int i = number1->size - 1; i >= 0; i--) {
         mod = mod * 10 + number1->digits[i];
-        appendBigNumber(result, mod / number2->digits[0]);
+        appendEndBigNumber(result, mod / number2->digits[0]);
         mod = mod % number2->digits[0];
     }
     return result;
@@ -142,7 +172,7 @@ BigNumber* BigNumberDiv(BigNumber* number1, BigNumber* number2) {
     int temp2 = number1->digits[number1->size - 1];
     while (temp2 < number2->digits[0]) temp2 = temp2 * 10 + number1->digits[--idx];
     while (number1->size > idx) {
-        appendBigNumber(temp, temp2 / number2->digits[0]);
+        appendEndBigNumber(temp, temp2 / number2->digits[0]);
         idx++;
         if (idx == number1->size) break;
         temp2 = (temp2 % number2->digits[0]) * 10 + number1->digits[idx];
@@ -153,19 +183,18 @@ BigNumber* BigNumberDiv(BigNumber* number1, BigNumber* number2) {
     return temp;
 }
 
-//  Convert a positive number `number` to its digit representation in base `n`.
-int* convert_base10_to_n(int* number, int length, int* resultLength, int new_base) {
-    int* result = (int*)malloc(sizeof(int) * 1000);
-    int i = 0;
+// Function to convert a positive number `number` to its digit representation in base `n`.
+BigNumber* convertBase10ToN(BigNumber* number, int n) {
+    BigNumber *digits = createBigNumber(number->capacity);
+    BigNumber *base = intToBigNumber(n);
+    BigNumber *temp = copyBigNumber(number);
     while (true) {
-        int* temp = bignumber_divide(number, length, &new_base, 1, &length);
-        int* temp2 = bignumber_mod(number, length, &new_base, 1, &length);
-        result[i] = temp2[0];
-        i++;
-        if (length == 1 && temp[0] == 0) {
+        BigNumber *mod = ModBigNumber(temp, base);
+        appendBeginBigNumber(digits, mod->digits);
+        temp = BigNumberDiv(temp, base);
+        if (temp->digits[0] == 0) {
             break;
         }
-        number = temp;
     }
     // digits = []
     // while n > 0:
