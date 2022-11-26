@@ -20,6 +20,7 @@ typedef struct {
     int capacity;
 } BigNumber;
 
+// Function to create a new empty BigNumber with a given capacity
 BigNumber* createBigNumber(int capacity) {
     BigNumber *number = (BigNumber*) malloc(sizeof(BigNumber));
     number->digits = (int*) malloc(sizeof(int) * capacity);
@@ -28,6 +29,17 @@ BigNumber* createBigNumber(int capacity) {
     return number;
 }
 
+// Function to create a new BigNumber from a string
+BigNumber* stringToBigNumber(char *string) {
+    int length = strlen(string);
+    BigNumber *number = createBigNumber(length);
+    for (int i = length - 1; i >= 0; i--) {
+        number->digits[number->size++] = string[i] - '0';
+    }
+    return number;
+}
+
+// Function to add a new digit to the big number
 void appendBigNumber(BigNumber *number, int digit) {
     if (number->size == number->capacity) {
         number->capacity *= 2;
@@ -36,11 +48,13 @@ void appendBigNumber(BigNumber *number, int digit) {
     number->digits[number->size++] = digit;
 }
 
+// Function to free the memory occupied by a big number
 void freeBigNumber(BigNumber *number) {
     free(number->digits);
     free(number);
 }
 
+// Function to print a BigNumber
 void printBigNumber(BigNumber *number) {
     for (int i = number->size - 1; i >= 0; i--) {
         printf("%d", number->digits[i]);
@@ -48,6 +62,7 @@ void printBigNumber(BigNumber *number) {
     printf("\n");
 }
 
+// Function to reverse a string
 void stringReverse(char *str) {
     int i = strlen(str) - 1, j = 0;
     char ch;
@@ -60,6 +75,7 @@ void stringReverse(char *str) {
     }
 }
 
+// Function to remove leading whitespaces of a string
 char* stringTrim(char* str) {
     char* end;
     while (isspace((unsigned char)*str)) str++;
@@ -70,7 +86,8 @@ char* stringTrim(char* str) {
     return str;
 }
 
-char *file_reads(char *filepath) {
+// Function to read contents of a file
+char *fileReads(char *filepath) {
 	FILE* file = fopen(filepath, "rb");
 	if (file == NULL) {
 		printf("Could not open file \"%s\".", filepath);
@@ -99,21 +116,10 @@ char *file_reads(char *filepath) {
 	return buffer;
 }
 
-int* convertString2Array(char* str, int length) {
-    int* array = (int*)malloc(sizeof(int) * length);
-    int i = 0;
-    while (*str != '\0') {
-        array[i++] = *str - '0';
-        str++;
-    }
-    array[i] = '\0';
-    return array;
-}
-
 // To return value of a char. For example, 2 is returned for '2'.  10 is returned for 'A', 11 for 'B'
 int convertCharToInt(char c) {
     if (c >= '0' && c <= '9') return (int)c - '0';
-    else return (int)c - 'A' + 10;
+    else return (int) c - 'A' + 10;
 }
 
 // Function to caclulate modulu of two large number
