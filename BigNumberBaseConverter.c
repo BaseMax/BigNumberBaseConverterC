@@ -391,14 +391,7 @@ char *toDeci(char *str, int base) {
         append++;
     }
 
-    // Convert the result from int array to char array
-    char *final = malloc(sizeof(char) * size + 1);
-    int i = 0;
-    while (i < append) {
-        final[i] = result[append - i - 1] + '0';
-        i++;
-    }
-    final[i] = '\0';
+    result[append] = '\0';
     
     return result;
 }
