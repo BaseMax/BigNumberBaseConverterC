@@ -13,6 +13,41 @@
 #include <inttypes.h>
 #include <math.h>
 
+// A structure to store big numbers in an array
+typedef struct {
+    int *digits;
+    int size;
+    int capacity;
+} BigNumber;
+
+BigNumber* createBigNumber(int capacity) {
+    BigNumber *number = (BigNumber*) malloc(sizeof(BigNumber));
+    number->digits = (int*) malloc(sizeof(int) * capacity);
+    number->size = 0;
+    number->capacity = capacity;
+    return number;
+}
+
+void appendBigNumber(BigNumber *number, int digit) {
+    if (number->size == number->capacity) {
+        number->capacity *= 2;
+        number->digits = (int*) realloc(number->digits, sizeof(int) * number->capacity);
+    }
+    number->digits[number->size++] = digit;
+}
+
+void freeBigNumber(BigNumber *number) {
+    free(number->digits);
+    free(number);
+}
+
+void printBigNumber(BigNumber *number) {
+    for (int i = number->size - 1; i >= 0; i--) {
+        printf("%d", number->digits[i]);
+    }
+    printf("\n");
+}
+
 void my_strrev(char *str) {
     int i = strlen(str) - 1, j = 0;
     char ch;
