@@ -226,20 +226,20 @@ BigNumber* convertBase10ToN(BigNumber* number, int n) {
     printf("n is %d\n", n);
 
     while (true) {
-        printf("temp is: ");
-        printBigNumber(temp);
+        // printf("temp is: ");
+        // printBigNumber(temp);
         BigNumber *mod = BigNumberMod(temp, n);
-        printf("\tmod: ");
-        printBigNumber(mod);
-        printf("\told temp values: ");
-        printBigNumber(temp);
-        for (int i = mod->size - 1; i >= 0; i--) {
-            appendBeginBigNumber(digits, mod->digits[i]);
+        // printf("\tmod: ");
+        // printBigNumber(mod);
+        // printf("\told temp values: ");
+        // printBigNumber(temp);
+        for (int i = 0; i < mod->size; i++) {
+            appendEndBigNumber(digits, mod->digits[i]);
         }
 
         temp = BigNumberDiv(temp, n);
-        printf("\tnew temp ---> ");
-        printBigNumber(temp);
+        // printf("\tnew temp ---> ");
+        // printBigNumber(temp);
         if (temp->size == 1 && temp->digits[0] == 0) break;
     }
 
@@ -248,16 +248,16 @@ BigNumber* convertBase10ToN(BigNumber* number, int n) {
 
 int main(int argc, char** argv) {
     // 1100 % 60 = 20
-    BigNumber *a = intToBigNumber(1100);
-    BigNumber *c = BigNumberMod(a, 60);
-    printf("20\t");
-    printBigNumber(c); // 20
+    // BigNumber *a = intToBigNumber(1100);
+    // BigNumber *c = BigNumberMod(a, 60);
+    // printf("20\t");
+    // printBigNumber(c); // 20
 
     // 1100 // 60 = 18
-    BigNumber *b = intToBigNumber(1100);
-    BigNumber *d = BigNumberDiv(b, 60);
-    printf("18\t");
-    printBigNumber(d); // 18
+    // BigNumber *b = intToBigNumber(1100);
+    // BigNumber *d = BigNumberDiv(b, 60);
+    // printf("18\t");
+    // printBigNumber(d); // 18
 
     if (argc != 4 && argc != 5) {
         printf("Usage: %s [number] [from] [to]\n", argv[0]);
