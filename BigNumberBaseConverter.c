@@ -190,24 +190,14 @@ BigNumber* convertBase10ToN(BigNumber* number, int n) {
     BigNumber *temp = copyBigNumber(number);
     while (true) {
         BigNumber *mod = ModBigNumber(temp, base);
-        appendBeginBigNumber(digits, mod->digits);
+        // BigNumber *mod_digit = createBigNumber(1);
+        // mod_digit->digits[0] = mod->digits[0];
+        appendBeginBigNumber(digits, mod->digits[0]);
         temp = BigNumberDiv(temp, base);
         if (temp->digits[0] == 0) {
             break;
         }
     }
-    // digits = []
-    // while n > 0:
-    //     digits.insert(0, n % b)
-    //     n  = n // b
-}
-
-void my_convert(char* input, int to) {
-    int len = strlen(input);
-
-    // Convert the input string to an array of integers
-    int* arr = str_to_int_array(input, len);
-    printf("\n");
 }
 
 int main(int argc, char** argv) {
@@ -222,16 +212,16 @@ int main(int argc, char** argv) {
     int to;
 
     if (argc == 4) {
-        number = trim(argv[1]);
+        number = stringTrim(argv[1]);
         from = atoi(argv[2]);
         to = atoi(argv[3]);
     } else if (argc == 5) {
-        number = file_reads(argv[2]);
+        number = fileReads(argv[2]);
         if (number == NULL) {
             printf("Error in reading the file!\n");
             return 1;
         }
-        number = trim(number);
+        number = stringTrim(number);
         from = atoi(argv[3]);
         to = atoi(argv[4]);
     }
@@ -249,8 +239,11 @@ int main(int argc, char** argv) {
     //     my_convert(number, to);
     // }
 
-    my_convert(number, to);
-    printf("\n");
+
+    BigNumber *number_10 = stringToBigNumber(number);
+    printBigNumber(number_10);
+    BigNumber* number_n = convertBase10ToN(number_10, from);
+    printBigNumber(number_n);
     
     return 0;
 }
