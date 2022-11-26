@@ -156,35 +156,18 @@ int convertCharToInt(char c) {
 }
 
 // Function to calculate modulu of two large number
-BigNumber* ModBigNumber(BigNumber* number1, BigNumber* number2) {
+BigNumber* ModBigNumber(BigNumber* number1, int number2) {
     BigNumber *result = createBigNumber(number1->size);
-    BigNumber *temp = createBigNumber(number1->size);
-    int i = 0;
-    while (i < number1->size) {
-        appendEndBigNumber(temp, number1->digits[i]);
-        i++;
-        int j = 0;
-        while (j < temp->size) {
-            if (temp->digits[j] >= number2->digits[0]) break;
-            j++;
-        }
-        if (j == temp->size) continue;
-        int k = 0;
-        while (k < number2->size) {
-            if (temp->digits[j] < number2->digits[k]) {
-                temp->digits[j] += 10;
-                temp->digits[j + 1]--;
-            }
-            temp->digits[j] -= number2->digits[k];
-            j++;
-            k++;
-        }
-        while (temp->size > 1 && temp->digits[temp->size - 1] == 0) {
-            temp->size--;
-        }
+    int remainder = 0;
+    for (int i = number1->size - 1; i >= 0; i--) {
+        int dividend = number1->digits[i] + remainder * 10;
+        result->digits[i] = dividend / number2;
+        remainder = dividend % number2;
     }
-    result = copyBigNumber(temp);
-    freeBigNumber(temp);
+    result->size = number1->size;
+    while (result->size > 1 && result->digits[result->size - 1] == 0) {
+        result->size--;
+    }
     return result;
 }
 
@@ -221,41 +204,45 @@ BigNumber* BigNumberDiv(BigNumber* number1, BigNumber* number2) {
     return result;
 }
 
+// Function to compare two large number
+int BigNumberCompare(BigNumber* number1, BigNumber* number2) {
+    if (number1->size > number2->size) return 1;
+    if (number1->size < number2->size) return -1;
+    for (int i = number1->size - 1; i >= 0; i--) {
+        if (number1->digits[i] > number2->digits[i]) return 1;
+        if (number1->digits[i] < number2->digits[i]) return -1;
+    }
+    return 0;
+}
+
 // Function to convert a positive number `number` to its digit representation in base `n`.
 BigNumber* convertBase10ToN(BigNumber* number, int n) {
     BigNumber *digits = createBigNumber(number->capacity);
-    BigNumber *base = intToBigNumber(n);
     BigNumber *temp = copyBigNumber(number);
-
-    printf("base: ");
-    printBigNumber(base);
+    BigNumber *base = intToBigNumber(10);
 
     while (true) {
-        printBigNumber(temp);
-        printBigNumber(base);
-        BigNumber *mod = ModBigNumber(temp, base);
+        BigNumber *mod = ModBigNumber(temp, n);
+        printf("mod: ");
         printBigNumber(mod);
-        printf("=================\n");
         for (int i = mod->size - 1; i >= 0; i--) {
             appendBeginBigNumber(digits, mod->digits[i]);
         }
         temp = BigNumberDiv(temp, base);
-        if (temp->digits[0] == 0) {
-            break;
-        }
+        printf("---> ");
+        printBigNumber(temp);
+        if (temp->size == 1 && temp->digits[0] == 0) break;
     }
 
     return digits;
 }
 
 int main(int argc, char** argv) {
-//    1100 10 60
-//    argc = 4;
-//    argv = (char**) malloc(sizeof(char*) * argc);
-//    argv[0] = "main";
-//    argv[1] = "1100";
-//    argv[2] = "10";
-//    argv[3] = "60";
+    // 1100 // 60 = 18
+    BigNumber *a = intToBigNumber(1100);
+    BigNumber *b = intToBigNumber(60);
+    BigNumber *c = BigNumberDiv(a, b);
+    printBigNumber(c);
 
     if (argc != 4 && argc != 5) {
         printf("Usage: %s [number] [from] [to]\n", argv[0]);
@@ -288,7 +275,7 @@ int main(int argc, char** argv) {
 
     printf("Result: ");
     BigNumber *number_10 = stringToBigNumber(number);
-    BigNumber* number_n = convertBase10ToN(number_10, from);
+    BigNumber *number_n = convertBase10ToN(number_10, to);
     printBigNumber(number_n);
     
     return 0;
