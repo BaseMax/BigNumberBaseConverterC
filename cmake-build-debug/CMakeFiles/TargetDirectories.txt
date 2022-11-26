@@ -1,3 +1,0 @@
-C:/Users/Max/BigNumberBaseConverterC/cmake-build-debug/CMakeFiles/BigNumberBaseConverterC.dir
-C:/Users/Max/BigNumberBaseConverterC/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Max/BigNumberBaseConverterC/cmake-build-debug/CMakeFiles/rebuild_cache.dir
