@@ -155,19 +155,40 @@ int convertCharToInt(char c) {
     else return (int) c - 'A' + 10;
 }
 
-// Function to caclulate modulu of two large number
+// Function to calculate modulu of two large number
 BigNumber* ModBigNumber(BigNumber* number1, BigNumber* number2) {
-    BigNumber *result = createBigNumber(1);
-    int mod = 0;
-    for (int i = number1->size - 1; i >= 0; i--) {
-        mod = mod * 10 + number1->digits[i];
-        appendEndBigNumber(result, mod / number2->digits[0]);
-        mod = mod % number2->digits[0];
+    BigNumber *result = createBigNumber(number1->size);
+    BigNumber *temp = createBigNumber(number1->size);
+    int i = 0;
+    while (i < number1->size) {
+        appendEndBigNumber(temp, number1->digits[i]);
+        i++;
+        int j = 0;
+        while (j < temp->size) {
+            if (temp->digits[j] >= number2->digits[0]) break;
+            j++;
+        }
+        if (j == temp->size) continue;
+        int k = 0;
+        while (k < number2->size) {
+            if (temp->digits[j] < number2->digits[k]) {
+                temp->digits[j] += 10;
+                temp->digits[j + 1]--;
+            }
+            temp->digits[j] -= number2->digits[k];
+            j++;
+            k++;
+        }
+        while (temp->size > 1 && temp->digits[temp->size - 1] == 0) {
+            temp->size--;
+        }
     }
+    result = copyBigNumber(temp);
+    freeBigNumber(temp);
     return result;
 }
 
-// Function to caclulate division of two large number
+// Function to calculate division of two large number
 BigNumber* BigNumberDiv(BigNumber* number1, BigNumber* number2) {
     BigNumber *result = createBigNumber(1);
     BigNumber *temp = createBigNumber(number1->size);
@@ -191,19 +212,37 @@ BigNumber* convertBase10ToN(BigNumber* number, int n) {
     BigNumber *digits = createBigNumber(number->capacity);
     BigNumber *base = intToBigNumber(n);
     BigNumber *temp = copyBigNumber(number);
+
+    printf("base: ");
+    printBigNumber(base);
+
     while (true) {
+        printBigNumber(temp);
+        printBigNumber(base);
         BigNumber *mod = ModBigNumber(temp, base);
-        // BigNumber *mod_digit = createBigNumber(1);
-        // mod_digit->digits[0] = mod->digits[0];
-        appendBeginBigNumber(digits, mod->digits[0]);
+        printBigNumber(mod);
+        printf("=================\n");
+        for (int i = mod->size - 1; i >= 0; i--) {
+            appendBeginBigNumber(digits, mod->digits[i]);
+        }
         temp = BigNumberDiv(temp, base);
         if (temp->digits[0] == 0) {
             break;
         }
     }
+
+    return digits;
 }
 
 int main(int argc, char** argv) {
+//    1100 10 60
+//    argc = 4;
+//    argv = (char**) malloc(sizeof(char*) * argc);
+//    argv[0] = "main";
+//    argv[1] = "1100";
+//    argv[2] = "10";
+//    argv[3] = "60";
+
     if (argc != 4 && argc != 5) {
         printf("Usage: %s [number] [from] [to]\n", argv[0]);
         printf("Usage: %s -f [file] [from] [to]\n", argv[0]);
@@ -235,7 +274,6 @@ int main(int argc, char** argv) {
 
     printf("Result: ");
     BigNumber *number_10 = stringToBigNumber(number);
-    printBigNumber(number_10);
     BigNumber* number_n = convertBase10ToN(number_10, from);
     printBigNumber(number_n);
     
