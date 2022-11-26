@@ -159,18 +159,12 @@ int convertCharToInt(char c) {
 
 // Function to calculate modulu of two large number
 BigNumber* BigNumberMod(BigNumber* number1, int number2) {
-    BigNumber *result = createBigNumber(number1->size);
     int remainder = 0;
     for (int i = number1->size - 1; i >= 0; i--) {
-        int dividend = number1->digits[i] + remainder * 10;
-        result->digits[i] = dividend / number2;
-        remainder = dividend % number2;
+        remainder = remainder * 10 + number1->digits[i];
+        remainder = remainder % number2;
     }
-    result->size = number1->size;
-    while (result->size > 1 && result->digits[result->size - 1] == 0) {
-        result->size--;
-    }
-    return result;
+    return intToBigNumber(remainder);
 }
 
 // Function to calculate subtraction of two large number
@@ -253,14 +247,17 @@ BigNumber* convertBase10ToN(BigNumber* number, int n) {
 }
 
 int main(int argc, char** argv) {
-    // 1100 // 60 = 18
+    // 1100 % 60 = 20
     BigNumber *a = intToBigNumber(1100);
     BigNumber *c = BigNumberMod(a, 60);
-    printBigNumber(c);
+    printf("20\t");
+    printBigNumber(c); // 20
 
+    // 1100 // 60 = 18
     BigNumber *b = intToBigNumber(1100);
     BigNumber *d = BigNumberDiv(b, 60);
-    printBigNumber(d);
+    printf("18\t");
+    printBigNumber(d); // 18
 
     if (argc != 4 && argc != 5) {
         printf("Usage: %s [number] [from] [to]\n", argv[0]);
