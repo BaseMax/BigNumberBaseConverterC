@@ -190,21 +190,35 @@ BigNumber* ModBigNumber(BigNumber* number1, BigNumber* number2) {
 
 // Function to calculate division of two large number
 BigNumber* BigNumberDiv(BigNumber* number1, BigNumber* number2) {
-    BigNumber *result = createBigNumber(1);
+    BigNumber *result = createBigNumber(number1->size);
     BigNumber *temp = createBigNumber(number1->size);
-    int idx = 0;
-    int temp2 = number1->digits[number1->size - 1];
-    while (temp2 < number2->digits[0]) temp2 = temp2 * 10 + number1->digits[--idx];
-    while (number1->size > idx) {
-        appendEndBigNumber(temp, temp2 / number2->digits[0]);
-        idx++;
-        if (idx == number1->size) break;
-        temp2 = (temp2 % number2->digits[0]) * 10 + number1->digits[idx];
+    int i = 0;
+    while (i < number1->size) {
+        appendEndBigNumber(temp, number1->digits[i]);
+        i++;
+        int j = 0;
+        while (j < temp->size) {
+            if (temp->digits[j] >= number2->digits[0]) break;
+            j++;
+        }
+        if (j == temp->size) continue;
+        int k = 0;
+        while (k < number2->size) {
+            if (temp->digits[j] < number2->digits[k]) {
+                temp->digits[j] += 10;
+                temp->digits[j + 1]--;
+            }
+            temp->digits[j] -= number2->digits[k];
+            j++;
+            k++;
+        }
+        while (temp->size > 1 && temp->digits[temp->size - 1] == 0) {
+            temp->size--;
+        }
     }
-    if (temp2 % number2->digits[0] == 0) {
-        return temp;
-    }
-    return temp;
+    result = copyBigNumber(temp);
+    freeBigNumber(temp);
+    return result;
 }
 
 // Function to convert a positive number `number` to its digit representation in base `n`.
