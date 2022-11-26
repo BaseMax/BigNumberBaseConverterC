@@ -4,7 +4,6 @@
 def toDigits(n, b):
     digits = []
     while n > 0:
-        print("->", n % b)
         digits.insert(0, n % b)
         n  = n // b
     return digits
@@ -35,8 +34,8 @@ def convertBase(digits, b, c):
 # print(toDigits(42, 2))
 # [1, 0, 1, 0, 1, 0]
 
-# print(toDigits(1100, 4))
 print(toDigits(1100, 60))
+print(toDigits(1100, 4))
 
 # list = ["a", "b", "c"]
 # list.insert(0, "d")
@@ -44,6 +43,6 @@ print(toDigits(1100, 60))
 # list.insert(0, "x")
 # print(list)
 
-print(1100 % 60)
-print(1100 // 60)
+# print(1100 % 60)
+# print(1100 // 60)
 # print(18 % 60)
