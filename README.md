@@ -47,7 +47,7 @@ The above command will convert the number `123456789` from base `10` to base `2`
 ### Convert a number from a file and save the result in another file
 
 ```bash
-$ ./BigNumberBaseConverter -f filename.txt 10 2 123456789 > result.txt
+$ ./BigNumberBaseConverter -f input.txt 10 2 > result.txt
 ```
 
 The above command will convert the number from the file `filename.txt` from base `10` to base `2` and print the result to the file `result.txt`.
@@ -55,7 +55,7 @@ The above command will convert the number from the file `filename.txt` from base
 ### Convert a number from a file and print the result to the console
 
 ```bash
-$ ./BigNumberBaseConverter -f filename.txt 10 2 123456789
+$ ./BigNumberBaseConverter -f input.txt 10 2
 ```
 
 The above command will convert the number from the file `filename.txt` from base `10` to base `2` and print the result to the console.
