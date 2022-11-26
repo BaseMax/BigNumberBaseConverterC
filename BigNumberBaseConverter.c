@@ -88,6 +88,9 @@ void freeBigNumber(BigNumber *number) {
 void printBigNumber(BigNumber *number) {
     for (int i = number->size - 1; i >= 0; i--) {
         printf("%d", number->digits[i]);
+        if (i != 0) {
+            printf(",");
+        }
     }
     printf("\n");
 }
@@ -231,15 +234,6 @@ int main(int argc, char** argv) {
     printf("To: %d\n", to);
 
     printf("Result: ");
-
-    // if (from != 10) {
-    //     char* num10 = toDeci(number, from);
-    //     printf("New Number in base 10: %s\n", num10);
-    // } else {
-    //     my_convert(number, to);
-    // }
-
-
     BigNumber *number_10 = stringToBigNumber(number);
     printBigNumber(number_10);
     BigNumber* number_n = convertBase10ToN(number_10, from);
