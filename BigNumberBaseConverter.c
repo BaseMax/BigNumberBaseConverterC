@@ -85,17 +85,6 @@ int BigNumberGetNumber(BigNumber *number) {
     return result;
 }
 
-// Function to add a new BigNumber at end of a big number
-void BigNumberAppendEndNumber(BigNumber *number, BigNumber *number2) {
-    if (number->size == number->capacity) {
-        number->capacity *= 2;
-        number->digits = (int*) realloc(number->digits, sizeof(int) * number->capacity);
-    }
-    for(int i=0; i<number2->size; i++) {
-        number->digits[number->size++] = number2->digits[i];
-    }
-}
-
 // Function to free the memory occupied by a big number
 void BigNumberFree(BigNumber *number) {
     free(number->digits);
@@ -250,9 +239,7 @@ BigNumber* convertBase10ToN(BigNumber* number, int n) {
     BigNumber *temp = copyBigNumber(number);
     while (true) {
         BigNumber *mod = BigNumberMod(temp, n);
-        for (int i = 0; i < mod->size; i++) {
-            BigNumberAppendEnd(digits, BigNumberGetNumber(mod));
-        }
+        BigNumberAppendEnd(digits, BigNumberGetNumber(mod));
         temp = BigNumberDiv(temp, n);
         if (temp->size == 1 && temp->digits[0] == 0) break;
     }
