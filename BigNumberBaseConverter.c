@@ -88,8 +88,6 @@ void printBigNumber(BigNumber *number) {
 // Function to deep copy a BigNumber
 BigNumber* copyBigNumber(BigNumber *number) {
     BigNumber *copy = createBigNumber(number->capacity);
-    printf("test print: ");
-    printBigNumber(number);
     for (int i = 0; i < number->size; i++) {
         copy->digits[i] = number->digits[i];
     }
@@ -222,43 +220,18 @@ int BigNumberCompare(BigNumber* number1, BigNumber* number2) {
 BigNumber* convertBase10ToN(BigNumber* number, int n) {
     BigNumber *digits = createBigNumber(number->capacity);
     BigNumber *temp = copyBigNumber(number);
-
-    printf("n is %d\n", n);
-
     while (true) {
-        // printf("temp is: ");
-        // printBigNumber(temp);
         BigNumber *mod = BigNumberMod(temp, n);
-        // printf("\tmod: ");
-        // printBigNumber(mod);
-        // printf("\told temp values: ");
-        // printBigNumber(temp);
         for (int i = 0; i < mod->size; i++) {
             appendEndBigNumber(digits, mod->digits[i]);
         }
-
         temp = BigNumberDiv(temp, n);
-        // printf("\tnew temp ---> ");
-        // printBigNumber(temp);
         if (temp->size == 1 && temp->digits[0] == 0) break;
     }
-
     return digits;
 }
 
 int main(int argc, char** argv) {
-    // 1100 % 60 = 20
-    // BigNumber *a = intToBigNumber(1100);
-    // BigNumber *c = BigNumberMod(a, 60);
-    // printf("20\t");
-    // printBigNumber(c); // 20
-
-    // 1100 // 60 = 18
-    // BigNumber *b = intToBigNumber(1100);
-    // BigNumber *d = BigNumberDiv(b, 60);
-    // printf("18\t");
-    // printBigNumber(d); // 18
-
     if (argc != 4 && argc != 5) {
         printf("Usage: %s [number] [from] [to]\n", argv[0]);
         printf("Usage: %s -f [file] [from] [to]\n", argv[0]);
@@ -288,9 +261,15 @@ int main(int argc, char** argv) {
     printf("From: %d\n", from);
     printf("To: %d\n", to);
 
+    BigNumber *number_10;
+    BigNumber *number_n;
+
+    if (from != 10) number_10 = convertBase10ToN(stringToBigNumber(number), 10);
+    else number_10 = stringToBigNumber(number);
+
+    number_n = convertBase10ToN(number_10, to);
+
     printf("Result: ");
-    BigNumber *number_10 = stringToBigNumber(number);
-    BigNumber *number_n = convertBase10ToN(number_10, to);
     printBigNumber(number_n);
     
     return 0;
